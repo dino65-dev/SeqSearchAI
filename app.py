@@ -78,6 +78,13 @@ if selected_id:
     #seq_record = SeqIO.read(uploaded_file, "fasta")
     #sequence = str(seq_record.seq)
 
+# Cached function to perform BLAST parsing
+@st.cache_data
+def parse_blast_results(blast_result_handle):
+    try:
+        return list(NCBIXML.parse(blast_result_handle))
+    except Exception as e:
+        raise ValueError(f"Error parsing BLAST results: {e}")
 
 # Perform BLAST Search Integration
 if sequence:
@@ -92,8 +99,12 @@ if sequence:
             if blast_result_handle:
                 st.success("BLAST search completed successfully.")
 
-                # Parse BLAST results and convert to a list for safe iteration
-                blast_records = list(NCBIXML.parse(blast_result_handle))
+                # Parse BLAST results and cache them
+                try:
+                    blast_records = parse_blast_results(blast_result_handle)
+                except ValueError as e:
+                    st.error(str(e))
+                    blast_records = []
 
                 if not blast_records:
                     st.warning("No BLAST records found.")
@@ -120,6 +131,7 @@ if sequence:
                             st.warning("No alignments found in this record.")
         except Exception as e:
             st.error(f"An error occurred while processing BLAST results: {e}")
+
 
 
 # User input for chat
