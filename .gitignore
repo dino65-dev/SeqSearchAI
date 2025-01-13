@@ -90,3 +90,5 @@ dmypy.json
 .project
 .idea/
 .vscode/
+# Ignore virtual environment directory
+env/
