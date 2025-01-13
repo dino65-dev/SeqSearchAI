@@ -92,30 +92,35 @@ if sequence:
             if blast_result_handle:
                 st.success("BLAST search completed successfully.")
 
-                # Parse BLAST results
-                blast_records = NCBIXML.parse(blast_result_handle)
-                for record in blast_records:
-                    st.write(f"Query: {record.query}")
-                    st.write(f"Database: {record.database}")
+                # Parse BLAST results and convert to a list for safe iteration
+                blast_records = list(NCBIXML.parse(blast_result_handle))
 
-                    if record.alignments:
-                        st.write(f"Number of alignments: {len(record.alignments)}")
-                        for alignment in record.alignments:
-                            st.write(f"Alignment title: {alignment.title}")
-                            st.write(f"Alignment length: {alignment.length}")
-                            for hsp in alignment.hsps:
-                                st.write(f"Expect value: {hsp.expect}")
-                                st.write(f"Score: {hsp.score}")
-                                st.write(f"Identities: {hsp.identities}")
-                                st.write(f"Query start: {hsp.query_start}, end: {hsp.query_end}")
-                                st.write(f"Subject start: {hsp.sbjct_start}, end: {hsp.sbjct_end}")
-                                st.write(f"Query sequence: {hsp.query}")
-                                st.write(f"Subject sequence: {hsp.sbjct}")
-                                
-                    else:
-                        st.warning("No alignments found.")
+                if not blast_records:
+                    st.warning("No BLAST records found.")
+                else:
+                    # Display BLAST results
+                    for record in blast_records:
+                        st.write(f"Query: {record.query}")
+                        st.write(f"Database: {record.database}")
+
+                        if record.alignments:
+                            st.write(f"Number of alignments: {len(record.alignments)}")
+                            for alignment in record.alignments:
+                                st.write(f"Alignment title: {alignment.title}")
+                                st.write(f"Alignment length: {alignment.length}")
+                                for hsp in alignment.hsps:
+                                    st.write(f"Expect value: {hsp.expect}")
+                                    st.write(f"Score: {hsp.score}")
+                                    st.write(f"Identities: {hsp.identities}")
+                                    st.write(f"Query start: {hsp.query_start}, end: {hsp.query_end}")
+                                    st.write(f"Subject start: {hsp.sbjct_start}, end: {hsp.sbjct_end}")
+                                    st.write(f"Query sequence: {hsp.query}")
+                                    st.write(f"Subject sequence: {hsp.sbjct}")
+                        else:
+                            st.warning("No alignments found in this record.")
         except Exception as e:
             st.error(f"An error occurred while processing BLAST results: {e}")
+
 
 # User input for chat
 st.header("Chat with AI")
